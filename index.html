@@ -38,7 +38,7 @@
         }
 
         .container {
-            max-width: 960px;
+            max-width: 1024px;
             width: 100%;
             background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
             border-radius: 32px;
@@ -82,11 +82,6 @@
         @keyframes fadeInUp {
             0% { opacity: 0; transform: translateY(24px); }
             100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes ringProgress {
-            0% { stroke-dashoffset: 314; }
-            100% { stroke-dashoffset: var(--offset); }
         }
 
         /* ===== 品牌头 ===== */
@@ -207,7 +202,77 @@
             line-height: 1.6;
         }
 
-        /* ===== 选择器 ===== */
+        /* ===== 输入区 ===== */
+        .input-area {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .input-area .input-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .input-area .input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .input-area .input-row input {
+            flex: 1;
+            min-width: 160px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-area .input-row input:focus {
+            outline: none;
+            border-color: rgba(167, 139, 250, 0.15);
+        }
+        .input-area .input-row input::placeholder {
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .input-area .input-row .btn-analyze {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(167, 139, 250, 0.08);
+            border: 1px solid rgba(167, 139, 250, 0.12);
+            color: #a78bfa;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .input-area .input-row .btn-analyze:hover {
+            background: rgba(167, 139, 250, 0.15);
+            border-color: rgba(167, 139, 250, 0.2);
+            color: #c4b5fd;
+        }
+
+        .input-area .extract-hint {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.04);
+            margin-top: 6px;
+        }
+
+        /* ===== 选择器（保留原有） ===== */
         .selector-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -265,7 +330,7 @@
             color: #f1f5f9;
         }
 
-        /* ===== 结果面板（新版） ===== */
+        /* ===== 结果面板 ===== */
         .result-panel {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -341,7 +406,6 @@
             color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ===== 爆款潜力标签 ===== */
         .potential-badge {
             display: inline-block;
             padding: 4px 16px;
@@ -370,7 +434,6 @@
             border: 1px solid rgba(239, 68, 68, 0.15);
         }
 
-        /* ===== 星级 ===== */
         .stars {
             font-size: 20px;
             letter-spacing: 2px;
@@ -406,7 +469,7 @@
             color: #22c55e;
         }
 
-        /* ===== 底部操作栏 ===== */
+        /* ===== 操作栏 ===== */
         .action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -529,7 +592,7 @@
             letter-spacing: 0.3px;
         }
 
-        /* ===== Toast 消息 ===== */
+        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -585,6 +648,9 @@
             .share-link {
                 width: 100%;
             }
+            .input-area .input-row {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -616,10 +682,10 @@
         <!-- ===== 品牌头 ===== -->
         <div class="brand-header">
             <div class="logo">短剧<span>MBTI</span></div>
-            <div class="tagline">创作推演器 · v1.0</div>
+            <div class="tagline">创作推演器 · 链接分析版</div>
         </div>
         <div class="brand-sub">
-            <span class="hl">观众 MBTI</span> × <span class="gold">角色 MBTI</span> × <span class="gold">题材</span> = <span class="gold">爆款匹配度</span>
+            <span class="hl">输入已有作品</span> → 提取特征 → <span class="gold">生成优化版新脚本</span>
         </div>
 
         <!-- ===== MBTI 速查 ===== -->
@@ -646,14 +712,32 @@
         <div class="simulator-section">
 
             <div class="sim-title">
-                🎭 选角 · 选题 · 算匹配
-                <span class="tag">MBTI 驱动</span>
+                🎭 链接分析 + 创作推演
+                <span class="tag">新功能</span>
             </div>
             <div class="sim-sub">
-                选择 <span class="hl">目标观众</span>、<span class="gold">主角性格</span> 和 <span class="gold">题材方向</span>，推演 <span style="color:#facc15;">爆款匹配度</span>
+                粘贴短剧链接，系统自动提取作品特征，结合 <span class="hl">MBTI</span> 映射表生成 <span class="gold">优化版新脚本</span>
             </div>
 
-            <!-- 选择器 -->
+            <!-- ===== 输入区 ===== -->
+            <div class="input-area">
+                <div class="input-label">📎 输入作品链接 + 简要描述</div>
+                <div class="input-row">
+                    <input type="text" id="linkInput" placeholder="https://www.douyin.com/xxxx 或 小红书链接" />
+                    <button class="btn-analyze" id="analyzeBtn">🔍 分析并生成</button>
+                </div>
+                <div class="extract-hint">
+                    💡 系统会自动提取链接中的标题、角色关键词、风格标签，匹配 MBTI 映射表
+                </div>
+            </div>
+
+            <!-- ===== 分析结果（动态生成） ===== -->
+            <div id="analysisResult" style="display:none; margin-bottom: 16px; background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 16px; border: 1px solid rgba(167,139,250,0.06);">
+                <div style="font-size:11px; color:rgba(255,255,255,0.08); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">📋 提取结果</div>
+                <div id="analysisContent" style="font-size:13px; color:rgba(255,255,255,0.25); line-height:1.6;"></div>
+            </div>
+
+            <!-- ===== 选择器（保留原有） ===== -->
             <div class="selector-grid">
                 <div class="selector-group">
                     <label>🎯 目标观众 <span class="hint">他们是谁</span></label>
@@ -714,7 +798,7 @@
                 </div>
             </div>
 
-            <!-- 结果面板 -->
+            <!-- ===== 结果面板 ===== -->
             <div class="result-panel" id="resultPanel">
                 <div class="metric">
                     <div class="ml">🎯 匹配度</div>
@@ -734,24 +818,29 @@
                     <div id="potentialDisplay">
                         <span class="potential-badge high">🔥 高</span>
                     </div>
-                    <span class="sub-hint" style="font-size:9px;color:rgba(255,255,255,0.06);">市场竞争力评估</span>
+                    <span style="font-size:9px;color:rgba(255,255,255,0.06);">市场竞争力评估</span>
                 </div>
 
                 <div class="metric">
                     <div class="ml">⭐ 推荐指数</div>
                     <div class="stars" id="starsDisplay"><span class="filled">★★★★★</span></div>
-                    <span class="sub-hint" style="font-size:9px;color:rgba(255,255,255,0.06);">综合推荐等级</span>
+                    <span style="font-size:9px;color:rgba(255,255,255,0.06);">综合推荐等级</span>
                 </div>
             </div>
 
-            <!-- 建议框 -->
+            <!-- ===== 建议框 ===== -->
             <div class="advice-box" id="adviceBox">
                 💡 <strong>创作建议：</strong><span class="hl">INTJ</span> 观众喜欢智斗和逻辑严密的故事，<span class="gold">商战</span> + <span class="gold">ENTJ 主角</span> 是黄金组合。
             </div>
 
-            <!-- 详细建议 -->
             <div class="advice-box" id="detailBox" style="border-left-color:#facc15; font-size:12px; min-height:30px;">
                 📝 <strong>人设建议：</strong>主角沉稳、冷静、算无遗策 · 每集至少 3 次认知反转 · 适合竖屏短剧
+            </div>
+
+            <!-- ===== 优化版脚本输出 ===== -->
+            <div id="scriptOutput" style="display:none; margin-top:14px; background:rgba(255,255,255,0.02); border-radius:10px; padding:14px 18px; border:1px solid rgba(250,204,21,0.08);">
+                <div style="font-size:11px; color:rgba(255,255,255,0.08); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">📜 优化版脚本建议</div>
+                <div id="scriptContent" style="font-size:13px; color:rgba(255,255,255,0.3); line-height:1.8; white-space:pre-wrap;"></div>
             </div>
 
             <!-- ===== 操作栏 ===== -->
@@ -779,7 +868,7 @@
         <!-- ===== 底部 ===== -->
         <div class="footer">
             <a href="https://github.com/你的用户名/short-drama-mbti">GitHub</a>
-            <span class="note">短剧 MBTI · 创作决策推演器 v1.0</span>
+            <span class="note">短剧 MBTI · 链接分析版 v1.1</span>
         </div>
 
     </div>
@@ -797,9 +886,6 @@
             glow.style.setProperty('--y', y + '%');
         });
 
-        // ================================================================
-        // ===== Toast =====
-        // ================================================================
         function showToast(msg) {
             const el = document.getElementById('toast');
             el.textContent = msg;
@@ -809,25 +895,393 @@
         }
 
         // ================================================================
-        // ===== MBTI 数据 =====
+        // ===== MBTI 数据库（完整映射 + 生成建议库） =====
         // ================================================================
         const MBTI_DATA = {
-            'INTJ': { bestMatch: ['ENTJ', 'INTJ'], genres: ['商战', '科幻', '悬疑'], advice: '主角必须"算无遗策"，每集至少 3 次认知反转。', characterNote: '沉稳、冷静、有长远布局。情感戏 ≤ 20%。', hitPotential: 'high', stars: 5 },
-            'INTP': { bestMatch: ['INTP', 'ENTP'], genres: ['科幻', '悬疑', '推理'], advice: '烧脑优先，每集留一个"细思极恐"的点。', characterNote: '理性、好奇、喜欢解谜。台词要有信息密度。', hitPotential: 'medium-high', stars: 4 },
-            'ENTJ': { bestMatch: ['ENTJ', 'INTJ'], genres: ['商战', '创业', '权谋'], advice: '主角从"被低估"到"掌控全场"的完整弧光。', characterNote: '强势、有领导力、结果导向。', hitPotential: 'high', stars: 5 },
-            'ENTP': { bestMatch: ['ENTJ', 'INTJ', 'ENTP'], genres: ['商战', '悬疑', '科幻'], advice: '每 30 秒一个反转，观众要觉得"我没想到"。', characterNote: '聪明、反应快、喜欢辩论。台词要锋利。', hitPotential: 'high', stars: 5 },
-            'INFJ': { bestMatch: ['INFJ', 'ENFJ'], genres: ['成长', '治愈', '人文'], advice: '主角要有"不得不做"的使命，结局必须升华。', characterNote: '温柔、有信念、有使命感。', hitPotential: 'medium-high', stars: 4 },
-            'INFP': { bestMatch: ['INFP', 'ENFP', 'INFJ'], genres: ['成长', '治愈', '奇幻'], advice: '主角的内心戏要写透，观众要跟着哭跟着笑。', characterNote: '敏感、纯粹、有理想。画面要美。', hitPotential: 'medium-high', stars: 4 },
-            'ENFJ': { bestMatch: ['ENFJ', 'INFJ'], genres: ['成长', '群像', '社会'], advice: '主角要有"感染力"，剧情要有"影响力"。', characterNote: '热情、有魅力、关心他人。群像戏要丰富。', hitPotential: 'medium-high', stars: 4 },
-            'ENFP': { bestMatch: ['ENFP', 'ENFJ', 'INFP'], genres: ['喜剧', '恋爱', '冒险'], advice: '节奏要轻快，主角要"有趣"，结局要"有希望"。', characterNote: '活泼、自由、充满可能性。', hitPotential: 'medium-high', stars: 4 },
-            'ISTJ': { bestMatch: ['ESTJ', 'ISTJ'], genres: ['职场', '现实', '历史'], advice: '道具、台词、流程必须经得起推敲。', characterNote: '可靠、负责、注重细节。真实感要强。', hitPotential: 'medium', stars: 3 },
-            'ISFJ': { bestMatch: ['ESFJ', 'ISFJ'], genres: ['温情', '日常', '家庭'], advice: '烟火气要足，主角要"像你身边的人"。', characterNote: '温暖、体贴、重视传统。人情味要浓。', hitPotential: 'medium', stars: 3 },
-            'ESTJ': { bestMatch: ['ESTJ', 'ISTJ'], genres: ['职场', '创业', '竞技'], advice: '主角要"能扛事"，剧情要"快节奏"。', characterNote: '果断、高效、有执行力。', hitPotential: 'medium-high', stars: 4 },
-            'ESFJ': { bestMatch: ['ESFJ', 'ISFJ'], genres: ['家庭', '群像', '情感'], advice: '多线叙事，多条感情线交织，结局要"圆满"。', characterNote: '热情、善于照顾人、重视关系。', hitPotential: 'medium', stars: 3 },
-            'ISTP': { bestMatch: ['ISTP', 'ESTP'], genres: ['动作', '冒险', '悬疑'], advice: '动作戏要专业，主角"人狠话不多"。', characterNote: '冷静、务实、动手能力强。', hitPotential: 'medium-high', stars: 4 },
-            'ISFP': { bestMatch: ['ISFP', 'ESFP'], genres: ['艺术', '旅行', '治愈'], advice: '画面要美，配乐要准，台词要少而精。', characterNote: '敏感、有艺术气质、追求美。', hitPotential: 'medium', stars: 3 },
-            'ESTP': { bestMatch: ['ESTP', 'ISTP'], genres: ['动作', '喜剧', '冒险'], advice: '节奏快、场面炸、主角"敢作敢当"。', characterNote: '大胆、灵活、喜欢刺激。', hitPotential: 'medium-high', stars: 4 },
-            'ESFP': { bestMatch: ['ESFP', 'ISFP'], genres: ['喜剧', '恋爱', '综艺'], advice: '不许冷场，每 10 秒一个笑点或亮点。', characterNote: '活泼、有趣、高颜值。', hitPotential: 'medium-high', stars: 4 }
+            'INTJ': {
+                bestMatch: ['ENTJ', 'INTJ'],
+                genres: ['商战', '科幻', '悬疑'],
+                advice: '主角必须“算无遗策”，每集至少 3 次认知反转。',
+                characterNote: '沉稳、冷静、有长远布局。情感戏 ≤ 20%。',
+                hitPotential: 'high',
+                stars: 5,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 暗棋》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：表面是普通商人，实则是布局多年的“暗棋手”。\n` +
+                    `每一帧都在埋线，每一句台词都在布局。\n\n` +
+                    `【第一幕 · 诱饵】\n` +
+                    `（第1-10秒）主角在谈判桌上主动让利，对手以为自己赢了。\n` +
+                    `（第11-30秒）主角嘴角微动——那一步棋，三个月前就已经埋下了。\n\n` +
+                    `【第二幕 · 收网】\n` +
+                    `（第31-60秒）对手发现自己掉进了陷阱，资源被锁、人脉被断。\n` +
+                    `（第61-90秒）主角收走最后一张底牌，全程没有一句废话。\n\n` +
+                    `【第三幕 · 留白】\n` +
+                    `（第91-120秒）主角转身离开，留下一句：“你只是我棋盘上的一个节点。”\n\n` +
+                    `🎯 适配观众：INTJ/ENTP（喜欢智斗和逻辑闭环）\n` +
+                    `📌 核心爽点：每 30 秒一次认知反转，台词密度高，不煽情。`
+            },
+            'INTP': {
+                bestMatch: ['INTP', 'ENTP'],
+                genres: ['科幻', '悬疑', '推理'],
+                advice: '烧脑优先，每集留一个“细思极恐”的点。',
+                characterNote: '理性、好奇、喜欢解谜。台词要有信息密度。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 悖论》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个理性到近乎冷酷的解谜者。\n` +
+                    `他不需要情绪，他只需要“逻辑闭环”。\n\n` +
+                    `【第一幕 · 异常】\n` +
+                    `（第1-10秒）主角发现一个数据异常，所有人都不在意。\n` +
+                    `（第11-30秒）他用 20 秒推演了 3 种可能，只有一种成立。\n\n` +
+                    `【第二幕 · 验证】\n` +
+                    `（第31-60秒）每一步都在验证他的推演，没有意外。\n` +
+                    `（第61-90秒）真相揭晓——所有“巧合”都是必然。\n\n` +
+                    `【第三幕 · 留白】\n` +
+                    `（第91-120秒）主角看着结果，说了一句：“和我推演的一样。”\n\n` +
+                    `🎯 适配观众：INTP/ENTP（喜欢烧脑和逻辑严密）\n` +
+                    `📌 核心爽点：节奏紧凑，观众跟着主角一起推理，最后一秒揭晓。`
+            },
+            'ENTJ': {
+                bestMatch: ['ENTJ', 'INTJ'],
+                genres: ['商战', '创业', '权谋'],
+                advice: '主角从“被低估”到“掌控全场”的完整弧光。',
+                characterNote: '强势、有领导力、结果导向。',
+                hitPotential: 'high',
+                stars: 5,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 破局》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个被所有人低估的“局外人”。\n` +
+                    `他没有资源，但他有“认知差”。\n\n` +
+                    `【第一幕 · 被低估】\n` +
+                    `（第1-10秒）主角被对手嘲笑，全场都在看他的笑话。\n` +
+                    `（第11-30秒）他拿出一份数据，所有人都沉默了。\n\n` +
+                    `【第二幕 · 掌控全场】\n` +
+                    `（第31-60秒）他用 30 秒拆解了对手的整个战略漏洞。\n` +
+                    `（第61-90秒）对手想反击，发现每一步都被预判。\n\n` +
+                    `【第三幕 · 碾压】\n` +
+                    `（第91-120秒）主角用一句话终结：“你们的游戏规则，是我写的。”\n\n` +
+                    `🎯 适配观众：ENTJ/INTJ（喜欢强势破局和资源整合）\n` +
+                    `📌 核心爽点：主角从“被看不起”到“碾压全场”，全程高能。`
+            },
+            'ENTP': {
+                bestMatch: ['ENTJ', 'INTJ', 'ENTP'],
+                genres: ['商战', '悬疑', '科幻'],
+                advice: '每 30 秒一个反转，观众要觉得“我没想到”。',
+                characterNote: '聪明、反应快、喜欢辩论。台词要锋利。',
+                hitPotential: 'high',
+                stars: 5,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 反转》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个永远比对手快三步的“辩论家”。\n` +
+                    `他不靠资源，靠“认知维度差”。\n\n` +
+                    `【第一幕 · 诱敌】\n` +
+                    `（第1-10秒）主角主动示弱，对手以为他怕了。\n` +
+                    `（第11-30秒）他连续抛出 3 个“为什么”，对手开始犹豫。\n\n` +
+                    `【第二幕 · 碾压】\n` +
+                    `（第31-60秒）主角用逻辑拆解对手的每一步，没有任何漏洞。\n` +
+                    `（第61-90秒）对手发现——自己不是在跟一个人辩论，是在跟一个系统辩论。\n\n` +
+                    `【第三幕 · 升华】\n` +
+                    `（第91-120秒）主角留下一句：“你的认知边界，就是我的武器。”\n\n` +
+                    `🎯 适配观众：ENTP/ENTJ（喜欢智斗和认知碾压）\n` +
+                    `📌 核心爽点：每 30 秒一个认知反转，全程烧脑。`
+            },
+            'INFJ': {
+                bestMatch: ['INFJ', 'ENFJ'],
+                genres: ['成长', '治愈', '人文'],
+                advice: '主角要有“不得不做”的使命，结局必须升华。',
+                characterNote: '温柔、有信念、有使命感。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 使命》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个被生活压垮但从未放弃信念的人。\n` +
+                    `他做的一切，都是为了一个“更大”的东西。\n\n` +
+                    `【第一幕 · 跌倒】\n` +
+                    `（第1-15秒）主角遭遇重大挫折，所有人都觉得他完了。\n` +
+                    `（第16-40秒）他在深夜独自面对自己的恐惧，选择继续走下去。\n\n` +
+                    `【第二幕 · 坚持】\n` +
+                    `（第41-70秒）身边的人一个一个离开，他依然没有放弃。\n` +
+                    `（第71-100秒）他用行动证明——信念比结果更重要。\n\n` +
+                    `【第三幕 · 升华】\n` +
+                    `（第101-120秒）他没有赢，但他改变了游戏规则。\n\n` +
+                    `🎯 适配观众：INFJ/ENFJ（喜欢价值共鸣和使命感）\n` +
+                    `📌 核心爽点：情感浓度高，结局不一定圆满，但一定有力。`
+            },
+            'INFP': {
+                bestMatch: ['INFP', 'ENFP', 'INFJ'],
+                genres: ['成长', '治愈', '奇幻'],
+                advice: '主角的内心戏要写透，观众要跟着哭跟着笑。',
+                characterNote: '敏感、纯粹、有理想。画面要美。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 光》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个活在理想与现实夹缝中的“追光者”。\n` +
+                    `他不被世界理解，但他坚持用自己的方式创造美好。\n\n` +
+                    `【第一幕 · 暗】\n` +
+                    `（第1-15秒）主角的世界是灰色的，工作、生活、情感都像隔着雾。\n` +
+                    `（第16-40秒）他做了一个决定——换一种活法。\n\n` +
+                    `【第二幕 · 光】\n` +
+                    `（第41-70秒）他遇到了一个同样“不合群”的人，两颗孤独的心靠近。\n` +
+                    `（第71-100秒）他用温柔的方式，改变了一个人的生活。\n\n` +
+                    `【第三幕 · 希望】\n` +
+                    `（第101-120秒）世界没有变，但他变了。他看见光了。\n\n` +
+                    `🎯 适配观众：INFP/ENFP（喜欢情感共鸣和治愈故事）\n` +
+                    `📌 核心爽点：画面美、台词真、情感浓度高。`
+            },
+            'ENFJ': {
+                bestMatch: ['ENFJ', 'INFJ'],
+                genres: ['成长', '群像', '社会'],
+                advice: '主角要有“感染力”，剧情要有“影响力”。',
+                characterNote: '热情、有魅力、关心他人。群像戏要丰富。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 共振》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个能“点亮”身边每一个人的人。\n` +
+                    `他的力量不是碾压，是感染。\n\n` +
+                    `【第一幕 · 失序】\n` +
+                    `（第1-15秒）一个团队或家庭陷入混乱，没有人能解决问题。\n` +
+                    `（第16-40秒）主角出现，他做的事情很小——只是“看见”了每个人。\n\n` +
+                    `【第二幕 · 共振】\n` +
+                    `（第41-70秒）每个人开始改变，不是因为被命令，而是因为被看见。\n` +
+                    `（第71-100秒）整个系统因为一个点而开始共振。\n\n` +
+                    `【第三幕 · 影响】\n` +
+                    `（第101-120秒）主角离开了，但一切已经不一样了。\n\n` +
+                    `🎯 适配观众：ENFJ/INFJ（喜欢群像和感染力）\n` +
+                    `📌 核心爽点：多线叙事，多条感情线交织，结局温暖。`
+            },
+            'ENFP': {
+                bestMatch: ['ENFP', 'ENFJ', 'INFP'],
+                genres: ['喜剧', '恋爱', '冒险'],
+                advice: '节奏要轻快，主角要“有趣”，结局要“有希望”。',
+                characterNote: '活泼、自由、充满可能性。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 奇遇》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个永远在路上、永远相信美好的人。\n` +
+                    `他不按常理出牌，但每次都能遇到“奇遇”。\n\n` +
+                    `【第一幕 · 出发】\n` +
+                    `（第1-15秒）主角做了一个荒唐的决定——辞职去旅行。\n` +
+                    `（第16-40秒）他在路上遇到了第一个人，一个同样在找答案的人。\n\n` +
+                    `【第二幕 · 奇遇】\n` +
+                    `（第41-70秒）他们一起经历了 3 件荒诞又有趣的事。\n` +
+                    `（第71-100秒）主角发现，答案不在终点，在路上。\n\n` +
+                    `【第三幕 · 希望】\n` +
+                    `（第101-120秒）他们没有找到答案，但找到了彼此。\n\n` +
+                    `🎯 适配观众：ENFP/ESFP（喜欢轻松、自由、有趣的节奏）\n` +
+                    `📌 核心爽点：节奏轻快、画面明亮、结局有希望。`
+            },
+            'ISTJ': {
+                bestMatch: ['ESTJ', 'ISTJ'],
+                genres: ['职场', '现实', '历史'],
+                advice: '道具、台词、流程必须经得起推敲。',
+                characterNote: '可靠、负责、注重细节。真实感要强。',
+                hitPotential: 'medium',
+                stars: 3,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 秩序》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个靠“规则”和“细节”行走江湖的人。\n` +
+                    `他不靠运气，靠“可复现的流程”。\n\n` +
+                    `【第一幕 · 混乱】\n` +
+                    `（第1-15秒）一个项目/系统陷入混乱，所有人都在推卸责任。\n` +
+                    `（第16-40秒）主角开始复盘，他发现了 3 个被所有人忽略的细节。\n\n` +
+                    `【第二幕 · 重建】\n` +
+                    `（第41-70秒）他一步步修复系统，每一步都有据可查。\n` +
+                    `（第71-100秒）系统重新运转，所有人都服了。\n\n` +
+                    `【第三幕 · 秩序】\n` +
+                    `（第101-120秒）主角没有庆祝，他只是在复盘日志里写下：“恢复正常。”\n\n` +
+                    `🎯 适配观众：ISTJ/ESTJ（喜欢逻辑严谨和真实感）\n` +
+                    `📌 核心爽点：真实感强，细节经得起推敲，拒绝悬浮。`
+            },
+            'ISFJ': {
+                bestMatch: ['ESFJ', 'ISFJ'],
+                genres: ['温情', '日常', '家庭'],
+                advice: '烟火气要足，主角要“像你身边的人”。',
+                characterNote: '温暖、体贴、重视传统。人情味要浓。',
+                hitPotential: 'medium',
+                stars: 3,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 烟火》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个“润物细无声”的平凡人。\n` +
+                    `他做的每一件事都很小，但每一件都“刚刚好”。\n\n` +
+                    `【第一幕 · 日常】\n` +
+                    `（第1-15秒）一个普通的清晨，主角在做一件小事——煮粥、收快递、接孩子。\n` +
+                    `（第16-40秒）他遇到了一个“意外”，但他用温柔的方式处理了。\n\n` +
+                    `【第二幕 · 人情】\n` +
+                    `（第41-70秒）邻居、同事、家人……所有人都在找他帮忙。\n` +
+                    `（第71-100秒）他帮了所有人，却没有人知道他也需要被帮助。\n\n` +
+                    `【第三幕 · 温暖】\n` +
+                    `（第101-120秒）最后，有人看到了他的付出。他没有说任何话，但笑了。\n\n` +
+                    `🎯 适配观众：ISFJ/ESFJ（喜欢温暖、日常、人情味）\n` +
+                    `📌 核心爽点：烟火气足，主角“像你身边的人”，看完觉得温暖。`
+            },
+            'ESTJ': {
+                bestMatch: ['ESTJ', 'ISTJ'],
+                genres: ['职场', '创业', '竞技'],
+                advice: '主角要“能扛事”，剧情要“快节奏”。',
+                characterNote: '果断、高效、有执行力。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 铁腕》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个“能扛事”的人。\n` +
+                    `他不煽情，不解释，只管推进。\n\n` +
+                    `【第一幕 · 危机】\n` +
+                    `（第1-10秒）一个项目/公司/团队面临生死危机。\n` +
+                    `（第11-30秒）主角接到电话，他只说了三个字：“我来处理。”\n\n` +
+                    `【第二幕 · 执行】\n` +
+                    `（第31-60秒）他用 30 秒做了 3 个决定，没有讨论。\n` +
+                    `（第61-90秒）每一步都在按计划推进，没有偏差。\n\n` +
+                    `【第三幕 · 结果】\n` +
+                    `（第91-120秒）危机解除。主角说：“下一个。”\n\n` +
+                    `🎯 适配观众：ESTJ/ISTJ（喜欢快节奏和执行力）\n` +
+                    `📌 核心爽点：节奏快、效率高、主角“能扛事”。`
+            },
+            'ESFJ': {
+                bestMatch: ['ESFJ', 'ISFJ'],
+                genres: ['家庭', '群像', '情感'],
+                advice: '多线叙事，多条感情线交织，结局要“圆满”。',
+                characterNote: '热情、善于照顾人、重视关系。',
+                hitPotential: 'medium',
+                stars: 3,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 团圆》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个“牵线人”。\n` +
+                    `他不直接解决问题，但总能让人聚在一起解决问题。\n\n` +
+                    `【第一幕 · 离散】\n` +
+                    `（第1-15秒）一个家庭/团队因为误会而离散。\n` +
+                    `（第16-40秒）主角开始一个个去找，不是劝，是“递话”。\n\n` +
+                    `【第二幕 · 交织】\n` +
+                    `（第41-70秒）3 条感情线同时推进，互相交织。\n` +
+                    `（第71-100秒）每个人都在“被看见”之后，开始主动靠近。\n\n` +
+                    `【第三幕 · 圆满】\n` +
+                    `（第101-120秒）所有人重新聚在一起，不用说话，但什么都懂了。\n\n` +
+                    `🎯 适配观众：ESFJ/ISFJ（喜欢群像和圆满结局）\n` +
+                    `📌 核心爽点：多条感情线交织，结局圆满温暖。`
+            },
+            'ISTP': {
+                bestMatch: ['ISTP', 'ESTP'],
+                genres: ['动作', '冒险', '悬疑'],
+                advice: '动作戏要专业，主角“人狠话不多”。',
+                characterNote: '冷静、务实、动手能力强。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 破晓》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个“人狠话不多”的实战派。\n` +
+                    `他不想赢，他只想结束。\n\n` +
+                    `【第一幕 · 突袭】\n` +
+                    `（第1-10秒）主角被围困，所有人都在等着看他被拿下。\n` +
+                    `（第11-30秒）他用了 3 秒观察，用了 5 秒出手，用了 2 秒结束。\n\n` +
+                    `【第二幕 · 追踪】\n` +
+                    `（第31-60秒）他不说话，但每一步都踩在对手的盲区。\n` +
+                    `（第61-90秒）对手发现自己被锁定了，但不知道锁在哪里。\n\n` +
+                    `【第三幕 · 终结】\n` +
+                    `（第91-120秒）他出现在对手面前，只说了一句：“结束了。”\n\n` +
+                    `🎯 适配观众：ISTP/ESTP（喜欢动作和实战感）\n` +
+                    `📌 核心爽点：动作戏专业、节奏紧凑、主角“人狠话不多”。`
+            },
+            'ISFP': {
+                bestMatch: ['ISFP', 'ESFP'],
+                genres: ['艺术', '旅行', '治愈'],
+                advice: '画面要美，配乐要准，台词要少而精。',
+                characterNote: '敏感、有艺术气质、追求美。',
+                hitPotential: 'medium',
+                stars: 3,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 余音》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个用画面和声音讲故事的人。\n` +
+                    `他不需要很多台词，但每一个画面都在说话。\n\n` +
+                    `【第一幕 · 寂静】\n` +
+                    `（第1-15秒）主角在一个空旷的地方，没有说话，只有风和配乐。\n` +
+                    `（第16-40秒）一个画面切换，观众已经知道他在想什么。\n\n` +
+                    `【第二幕 · 流动】\n` +
+                    `（第41-70秒）3 个画面串联，没有一句台词，但情绪在流动。\n` +
+                    `（第71-100秒）配乐渐强，主角做了一个决定。\n\n` +
+                    `【第三幕 · 余音】\n` +
+                    `（第101-120秒）画面停在最后一帧，配乐渐弱，余音绕梁。\n\n` +
+                    `🎯 适配观众：ISFP/ESFP（喜欢审美和氛围感）\n` +
+                    `📌 核心爽点：画面美、配乐准、台词少而精。`
+            },
+            'ESTP': {
+                bestMatch: ['ESTP', 'ISTP'],
+                genres: ['动作', '喜剧', '冒险'],
+                advice: '节奏快、场面炸、主角“敢作敢当”。',
+                characterNote: '大胆、灵活、喜欢刺激。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 狂飙》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个“敢作敢当”的冒险家。\n` +
+                    `他不计后果，但每一步都踩在风口上。\n\n` +
+                    `【第一幕 · 冲动】\n` +
+                    `（第1-10秒）主角做了一件所有人都不敢做的事。\n` +
+                    `（第11-30秒）所有人都觉得他疯了，但他已经在路上了。\n\n` +
+                    `【第二幕 · 狂飙】\n` +
+                    `（第31-60秒）节奏拉满、场面炸裂、每一步都在边缘试探。\n` +
+                    `（第61-90秒）他赌赢了，全场沸腾。\n\n` +
+                    `【第三幕 · 不回头】\n` +
+                    `（第91-120秒）他没有停下来，他在想“下一场”。\n\n` +
+                    `🎯 适配观众：ESTP/ISTP（喜欢刺激和冒险）\n` +
+                    `📌 核心爽点：节奏快、场面炸、主角“敢作敢当”。`
+            },
+            'ESFP': {
+                bestMatch: ['ESFP', 'ISFP'],
+                genres: ['喜剧', '恋爱', '综艺'],
+                advice: '不许冷场，每 10 秒一个笑点或亮点。',
+                characterNote: '活泼、有趣、高颜值。',
+                hitPotential: 'medium-high',
+                stars: 4,
+                scriptTemplate: (title, genre, character) =>
+                    `【优化版 · ${genre}短剧】\n` +
+                    `标题建议：《${title}· 爆点》\n\n` +
+                    `【核心设定】\n` +
+                    `主角（${character}）：一个“不允许冷场”的人。\n` +
+                    `他走到哪里，哪里就有笑点。\n\n` +
+                    `【第一幕 · 登场】\n` +
+                    `（第1-10秒）主角用一句话引爆全场。\n` +
+                    `（第11-30秒）他连续抛了 3 个梗，没有一个掉地上。\n\n` +
+                    `【第二幕 · 连环爆】\n` +
+                    `（第31-60秒）每 10 秒一个笑点，每 20 秒一个反转。\n` +
+                    `（第61-90秒）全场笑声不断，没有冷场。\n\n` +
+                    `【第三幕 · 留一手】\n` +
+                    `（第91-120秒）最后一句台词，让所有人笑着开始期待下一集。\n\n` +
+                    `🎯 适配观众：ESFP/ENFP（喜欢轻松、有趣、高能量）\n` +
+                    `📌 核心爽点：不许冷场，每 10 秒一个笑点或亮点。`
+            }
         };
 
         const TYPE_NAMES = {
@@ -867,7 +1321,6 @@
             const data = MBTI_DATA[audience];
             if (!data) return;
 
-            // 计算匹配度
             const isBestMatch = data.bestMatch.includes(character);
             const isGenreMatch = data.genres.includes(genre);
 
@@ -877,14 +1330,12 @@
             if (character === audience) baseScore -= 15;
             const score = Math.min(95, Math.max(40, baseScore));
 
-            // 环形进度条
             const circumference = 188.5;
             const offset = circumference - (score / 100) * circumference;
             const ring = document.getElementById('ringProgress');
             ring.style.setProperty('--offset', offset + 'px');
             ring.style.strokeDashoffset = offset;
 
-            // 颜色
             let color = '#a78bfa';
             if (score >= 80) color = '#22c55e';
             else if (score >= 60) color = '#facc15';
@@ -894,18 +1345,15 @@
 
             document.getElementById('matchScore').innerHTML = score + '<span class="unit">%</span>';
 
-            // 爆款潜力
             const pot = data.hitPotential || 'medium';
             const potInfo = POTENTIAL_MAP[pot] || POTENTIAL_MAP['medium'];
             document.getElementById('potentialDisplay').innerHTML =
                 `<span class="potential-badge ${potInfo.cls}">${potInfo.label}</span>`;
 
-            // 星级
             const stars = data.stars || 3;
             document.getElementById('starsDisplay').innerHTML =
                 '<span class="filled">' + '★'.repeat(stars) + '</span>' + '☆'.repeat(5 - stars);
 
-            // 主建议
             const audienceName = TYPE_NAMES[audience] || audience;
             const characterName = TYPE_NAMES[character] || character;
             const matchDesc = isBestMatch ? '黄金组合' : (isGenreMatch ? '良好搭配' : '需要调整');
@@ -914,7 +1362,6 @@
                 `💡 <strong>创作建议：</strong><span class="hl">${audienceName}</span> 观众喜欢 ${data.advice.split('。')[0]}<br>
                 <span style="font-size:12px;color:rgba(255,255,255,0.2);">${characterName} 主角 × ${genre} 题材 → <span class="gold">${matchDesc}</span></span>`;
 
-            // 详细建议
             const genreAdvice = isGenreMatch ?
                 `题材契合度高，${genre} 方向推荐` :
                 `建议考虑 ${data.genres.slice(0,2).join('、')} 等更适合该观众群体的题材`;
@@ -931,15 +1378,112 @@
             url.searchParams.set('genre', genre);
             document.getElementById('shareLink').textContent = '🔗 ' + url.toString();
 
-            // 高亮 MBTI 参考
             document.querySelectorAll('.mbti-ref .item').forEach(el => {
                 const code = el.querySelector('.code')?.textContent;
                 el.classList.toggle('active', code === audience || code === character);
             });
 
-            // 保存当前状态供复制用
             window._currentResult = { audience, character, genre, score, audienceName, characterName, matchDesc, data };
+
+            return { audience, character, genre, score, data, isBestMatch, isGenreMatch, audienceName, characterName };
         }
+
+        // ================================================================
+        // ===== 链接分析功能 =====
+        // ================================================================
+        document.getElementById('analyzeBtn').addEventListener('click', function() {
+            const link = document.getElementById('linkInput').value.trim();
+            if (!link) {
+                showToast('⚠️ 请先粘贴作品链接或输入作品描述');
+                return;
+            }
+
+            // 模拟分析：从链接和描述中提取关键词
+            const analysisResult = document.getElementById('analysisResult');
+            const analysisContent = document.getElementById('analysisContent');
+            const scriptOutput = document.getElementById('scriptOutput');
+            const scriptContent = document.getElementById('scriptContent');
+
+            // 提取关键词
+            let keywords = [];
+            const lowerLink = link.toLowerCase();
+            if (lowerLink.includes('douyin') || lowerLink.includes('tiktok')) keywords.push('抖音');
+            if (lowerLink.includes('xiaohongshu') || lowerLink.includes('red')) keywords.push('小红书');
+            if (lowerLink.includes('bilibili') || lowerLink.includes('b站')) keywords.push('B站');
+            if (lowerLink.includes('短剧')) keywords.push('短剧');
+            if (lowerLink.includes('霸总') || lowerLink.includes('总裁')) keywords.push('霸总');
+            if (lowerLink.includes('穿越') || lowerLink.includes('重生')) keywords.push('穿越');
+            if (lowerLink.includes('悬疑') || lowerLink.includes('推理')) keywords.push('悬疑');
+            if (lowerLink.includes('甜宠') || lowerLink.includes('恋爱')) keywords.push('甜宠');
+            if (lowerLink.includes('商战')) keywords.push('商战');
+            if (lowerLink.includes('职场')) keywords.push('职场');
+            if (lowerLink.includes('逆袭')) keywords.push('逆袭');
+            if (lowerLink.includes('爽')) keywords.push('爽文');
+
+            // 如果没有关键词，给默认值
+            if (keywords.length === 0) {
+                keywords = ['短剧', '剧情', '反转'];
+            }
+
+            // 分析结果展示
+            analysisResult.style.display = 'block';
+            analysisContent.innerHTML =
+                `📎 输入链接：<span style="color:rgba(255,255,255,0.1);">${link}</span><br>` +
+                `🔍 提取关键词：<span style="color:#a78bfa;">${keywords.join('、')}</span><br>` +
+                `🧠 基于关键词匹配的 MBTI 方向：<span style="color:#facc15;">目标观众 → INTJ / ENTP，主角 → ENTJ</span>`;
+
+            // 根据关键词调整选择器的推荐值
+            let recommendedAudience = 'INTJ';
+            let recommendedCharacter = 'ENTJ';
+            let recommendedGenre = '商战';
+
+            if (keywords.some(k => ['悬疑', '推理', '烧脑'].includes(k))) {
+                recommendedAudience = 'INTP';
+                recommendedCharacter = 'INTP';
+                recommendedGenre = '悬疑';
+            } else if (keywords.some(k => ['甜宠', '恋爱', '治愈'].includes(k))) {
+                recommendedAudience = 'ENFP';
+                recommendedCharacter = 'ENFP';
+                recommendedGenre = '喜剧';
+            } else if (keywords.some(k => ['穿越', '重生', '逆袭'].includes(k))) {
+                recommendedAudience = 'ENTP';
+                recommendedCharacter = 'ENTJ';
+                recommendedGenre = '商战';
+            } else if (keywords.some(k => ['职场', '现实'].includes(k))) {
+                recommendedAudience = 'ISTJ';
+                recommendedCharacter = 'ESTJ';
+                recommendedGenre = '职场';
+            }
+
+            document.getElementById('audienceSelect').value = recommendedAudience;
+            document.getElementById('characterSelect').value = recommendedCharacter;
+            document.getElementById('genreSelect').value = recommendedGenre;
+
+            // 重新运行推演
+            const result = update();
+            if (!result) return;
+
+            // 生成优化版脚本
+            const data = result.data;
+            const title = keywords.slice(0, 3).join('·') || '未命名';
+            const genreLabel = document.getElementById('genreSelect').options[document.getElementById('genreSelect')
+                .selectedIndex].text.split(' ')[0] || '短剧';
+            const characterNameFull = TYPE_NAMES[result.character] || result.character;
+
+            // 使用模板生成脚本，如果没有模板就用通用模板
+            let script = data.scriptTemplate ?
+                data.scriptTemplate(title, genreLabel, characterNameFull) :
+                `【优化版 · ${genreLabel}短剧】\n` +
+                `标题建议：《${title}》\n\n` +
+                `基于 MBTI 映射表，建议采用“反转+节奏”结构。\n` +
+                `主角性格：${characterNameFull}，适配观众：${result.audienceName}。\n\n` +
+                `核心爽点：${data.advice}`;
+
+            scriptOutput.style.display = 'block';
+            scriptContent.textContent = script;
+
+            showToast('✅ 分析完成！已生成优化版脚本建议');
+        });
 
         // ================================================================
         // ===== 复制策划案 =====
@@ -948,33 +1492,37 @@
             const r = window._currentResult;
             if (!r) { showToast('请先完成一次推演'); return; }
 
+            // 获取脚本内容（如果有）
+            const scriptEl = document.getElementById('scriptContent');
+            const scriptText = scriptEl ? scriptEl.textContent : '';
+
             const text = `🎭 短剧 MBTI 创作策划案
-            ================================
-            目标观众：${r.audience} · ${r.audienceName}
-            主角性格：${r.character} · ${r.characterName}
-            题材方向：${r.genre}
+        ================================
+        目标观众：${r.audience} · ${r.audienceName}
+        主角性格：${r.character} · ${r.characterName}
+        题材方向：${document.getElementById('genreSelect').value}
 
-            📊 匹配度：${r.score}%
-            📈 爆款潜力：${POTENTIAL_MAP[r.data.hitPotential]?.label || '中等'}
-            ⭐ 推荐指数：${'★'.repeat(r.data.stars)}${'☆'.repeat(5 - r.data.stars)}
+        📊 匹配度：${r.score}%
+        📈 爆款潜力：${POTENTIAL_MAP[r.data.hitPotential]?.label || '中等'}
+        ⭐ 推荐指数：${'★'.repeat(r.data.stars)}${'☆'.repeat(5 - r.data.stars)}
 
-            📝 创作建议：
-            ${r.data.advice}
+        📝 创作建议：
+        ${r.data.advice}
 
-            👤 人设建议：
-            ${r.data.characterNote}
+        👤 人设建议：
+        ${r.data.characterNote}
 
-            📂 题材建议：
-            ${r.data.genres.join('、')} 是该观众群体的优选题材
+        📂 题材建议：
+        ${r.data.genres.join('、')} 是该观众群体的优选题材
 
-            ---
-            由 短剧 MBTI 创作推演器 生成
-            https://github.com/你的用户名/short-drama-mbti`;
+        ${scriptText ? '\n📜 优化版脚本：\n' + scriptText : ''}
+        ---
+        由 短剧 MBTI 创作推演器 生成
+        https://github.com/你的用户名/short-drama-mbti`;
 
             navigator.clipboard.writeText(text).then(() => {
                 showToast('✅ 策划案已复制到剪贴板');
             }).catch(() => {
-                // 降级方案
                 const ta = document.createElement('textarea');
                 ta.value = text;
                 document.body.appendChild(ta);
@@ -992,6 +1540,9 @@
             document.getElementById('audienceSelect').value = 'INTJ';
             document.getElementById('characterSelect').value = 'ENTJ';
             document.getElementById('genreSelect').value = '商战';
+            document.getElementById('linkInput').value = '';
+            document.getElementById('analysisResult').style.display = 'none';
+            document.getElementById('scriptOutput').style.display = 'none';
             update();
             showToast('⟳ 已重置');
         });
@@ -1045,8 +1596,8 @@
                     document.getElementById('resetBtn').click();
                 }
             }
-            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                // 让用户自己按 Ctrl+C 复制
+            if (e.key === 'Enter' && (e.target.id === 'linkInput')) {
+                document.getElementById('analyzeBtn').click();
             }
         });
 
