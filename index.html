@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>短剧 MBTI · 创作推演器</title>
+    <style>
+        /* ===== 全局 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            cursor: default;
+            color: #f1f5f9;
+        }
+
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
+        }
+
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 36px 40px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.5);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
+
+        .container::before,
+        .container::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        .container::before {
+            top: -80px;
+            right: -80px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.10), transparent 70%);
+        }
+        .container::after {
+            bottom: -60px;
+            left: -60px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.06), transparent 70%);
+            animation-direction: alternate-reverse;
+        }
+
+        @keyframes floatBg {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -20px) scale(1.1); }
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(24px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes ringProgress {
+            0% { stroke-dashoffset: 314; }
+            100% { stroke-dashoffset: var(--offset); }
+        }
+
+        /* ===== 品牌头 ===== */
+        .brand-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease forwards;
+        }
+
+        .brand-header .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.3px;
+        }
+        .brand-header .logo span {
+            color: #a78bfa;
+        }
+
+        .brand-header .tagline {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.12);
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            border-left: 1px solid rgba(255, 255, 255, 0.04);
+            padding-left: 12px;
+        }
+
+        .brand-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.04s forwards;
+        }
+        .brand-sub .hl {
+            color: #a78bfa;
+        }
+        .brand-sub .gold {
+            color: #facc15;
+        }
+
+        /* ===== MBTI 速查 ===== */
+        .mbti-ref {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            margin-bottom: 16px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.06s forwards;
+        }
+
+        .mbti-ref .item {
+            text-align: center;
+            font-size: 10px;
+            padding: 2px 0;
+            border-radius: 4px;
+            color: rgba(255, 255, 255, 0.08);
+            transition: color 0.3s ease;
+        }
+        .mbti-ref .item.active {
+            color: rgba(167, 139, 250, 0.4);
+        }
+        .mbti-ref .item .code {
+            font-weight: 600;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.12);
+        }
+        .mbti-ref .item .name {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== 主面板 ===== */
+        .simulator-section {
+            background: rgba(167, 139, 250, 0.03);
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            border-radius: 16px;
+            padding: 22px 24px 18px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.08s forwards;
+        }
+
+        .sim-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sim-title .tag {
+            font-size: 10px;
+            font-weight: 500;
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.08);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .sim-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        /* ===== 选择器 ===== */
+        .selector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .selector-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .selector-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .selector-group label .hint {
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 10px;
+        }
+
+        .selector-group select {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.1)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .selector-group select:hover {
+            border-color: rgba(167, 139, 250, 0.15);
+        }
+        .selector-group select:focus {
+            outline: none;
+            border-color: rgba(167, 139, 250, 0.3);
+        }
+        .selector-group select option {
+            background: #1a1a2e;
+            color: #f1f5f9;
+        }
+
+        /* ===== 结果面板（新版） ===== */
+        .result-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 14px;
+            align-items: center;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric .ml {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        /* ===== 环形进度条 ===== */
+        .ring-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ring-wrapper {
+            position: relative;
+            width: 72px;
+            height: 72px;
+        }
+
+        .ring-wrapper svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .ring-wrapper .bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 6;
+        }
+
+        .ring-wrapper .progress {
+            fill: none;
+            stroke: #a78bfa;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 188.5;
+            stroke-dashoffset: 188.5;
+            transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease;
+        }
+
+        .ring-wrapper .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .ring-wrapper .center-text .unit {
+            font-size: 10px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== 爆款潜力标签 ===== */
+        .potential-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .potential-badge.high {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+        }
+        .potential-badge.medium-high {
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.08);
+            border: 1px solid rgba(250, 204, 21, 0.15);
+        }
+        .potential-badge.medium {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.08);
+            border: 1px solid rgba(96, 165, 250, 0.15);
+        }
+        .potential-badge.low {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        /* ===== 星级 ===== */
+        .stars {
+            font-size: 20px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.04);
+        }
+        .stars .filled {
+            color: #facc15;
+        }
+
+        /* ===== 建议框 ===== */
+        .advice-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border-left: 3px solid #a78bfa;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 13px;
+            line-height: 1.7;
+            min-height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .advice-box strong {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .advice-box .hl {
+            color: #a78bfa;
+        }
+        .advice-box .gold {
+            color: #facc15;
+        }
+        .advice-box .green {
+            color: #22c55e;
+        }
+
+        /* ===== 底部操作栏 ===== */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: rgba(167, 139, 250, 0.06);
+            border-color: rgba(167, 139, 250, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn.primary {
+            background: rgba(167, 139, 250, 0.08);
+            border-color: rgba(167, 139, 250, 0.12);
+            color: #a78bfa;
+        }
+
+        .btn.primary:hover {
+            background: rgba(167, 139, 250, 0.15);
+            border-color: rgba(167, 139, 250, 0.2);
+            color: #c4b5fd;
+        }
+
+        .btn .icon {
+            font-size: 14px;
+        }
+
+        .share-link {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            flex: 1;
+            min-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ===== 反馈 ===== */
+        .feedback-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.06);
+        }
+
+        .feedback-bar .fb-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.06);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .feedback-bar .fb-btn:hover {
+            color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .feedback-bar .fb-btn.selected {
+            color: #facc15;
+        }
+
+        /* ===== 底部 ===== */
+        .footer {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.15s forwards;
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.06);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+        .footer a:hover {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .footer .note {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.03);
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== Toast 消息 ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: rgba(167, 139, 250, 0.12);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 13px;
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transition: all 0.5s ease;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0px);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 700px) {
+            body {
+                padding: 12px;
+            }
+            .container {
+                padding: 20px 16px 16px;
+                border-radius: 20px;
+            }
+            .brand-header .tagline {
+                border-left: none;
+                padding-left: 0;
+                width: 100%;
+            }
+            .selector-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .result-panel {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .mbti-ref {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 2px;
+            }
+            .action-bar {
+                flex-direction: column;
+            }
+            .share-link {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px 14px;
+            }
+            .result-panel {
+                grid-template-columns: 1fr;
+            }
+            .mbti-ref {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .ring-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+            .ring-wrapper .center-text {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="glow"></div>
+
+    <div class="container">
+
+        <!-- ===== 品牌头 ===== -->
+        <div class="brand-header">
+            <div class="logo">短剧<span>MBTI</span></div>
+            <div class="tagline">创作推演器 · v1.0</div>
+        </div>
+        <div class="brand-sub">
+            <span class="hl">观众 MBTI</span> × <span class="gold">角色 MBTI</span> × <span class="gold">题材</span> = <span class="gold">爆款匹配度</span>
+        </div>
+
+        <!-- ===== MBTI 速查 ===== -->
+        <div class="mbti-ref" id="mbtiRef">
+            <div class="item"><div class="code">INTJ</div><div class="name">建筑师</div></div>
+            <div class="item"><div class="code">INTP</div><div class="name">逻辑学家</div></div>
+            <div class="item"><div class="code">ENTJ</div><div class="name">指挥官</div></div>
+            <div class="item"><div class="code">ENTP</div><div class="name">辩论家</div></div>
+            <div class="item"><div class="code">INFJ</div><div class="name">提倡者</div></div>
+            <div class="item"><div class="code">INFP</div><div class="name">调停者</div></div>
+            <div class="item"><div class="code">ENFJ</div><div class="name">主人公</div></div>
+            <div class="item"><div class="code">ENFP</div><div class="name">竞选者</div></div>
+            <div class="item"><div class="code">ISTJ</div><div class="name">物流师</div></div>
+            <div class="item"><div class="code">ISFJ</div><div class="name">守卫者</div></div>
+            <div class="item"><div class="code">ESTJ</div><div class="name">总经理</div></div>
+            <div class="item"><div class="code">ESFJ</div><div class="name">执政官</div></div>
+            <div class="item"><div class="code">ISTP</div><div class="name">鉴赏家</div></div>
+            <div class="item"><div class="code">ISFP</div><div class="name">探险家</div></div>
+            <div class="item"><div class="code">ESTP</div><div class="name">企业家</div></div>
+            <div class="item"><div class="code">ESFP</div><div class="name">表演者</div></div>
+        </div>
+
+        <!-- ===== 主面板 ===== -->
+        <div class="simulator-section">
+
+            <div class="sim-title">
+                🎭 选角 · 选题 · 算匹配
+                <span class="tag">MBTI 驱动</span>
+            </div>
+            <div class="sim-sub">
+                选择 <span class="hl">目标观众</span>、<span class="gold">主角性格</span> 和 <span class="gold">题材方向</span>，推演 <span style="color:#facc15;">爆款匹配度</span>
+            </div>
+
+            <!-- 选择器 -->
+            <div class="selector-grid">
+                <div class="selector-group">
+                    <label>🎯 目标观众 <span class="hint">他们是谁</span></label>
+                    <select id="audienceSelect">
+                        <option value="INTJ" selected>INTJ · 建筑师</option>
+                        <option value="INTP">INTP · 逻辑学家</option>
+                        <option value="ENTJ">ENTJ · 指挥官</option>
+                        <option value="ENTP">ENTP · 辩论家</option>
+                        <option value="INFJ">INFJ · 提倡者</option>
+                        <option value="INFP">INFP · 调停者</option>
+                        <option value="ENFJ">ENFJ · 主人公</option>
+                        <option value="ENFP">ENFP · 竞选者</option>
+                        <option value="ISTJ">ISTJ · 物流师</option>
+                        <option value="ISFJ">ISFJ · 守卫者</option>
+                        <option value="ESTJ">ESTJ · 总经理</option>
+                        <option value="ESFJ">ESFJ · 执政官</option>
+                        <option value="ISTP">ISTP · 鉴赏家</option>
+                        <option value="ISFP">ISFP · 探险家</option>
+                        <option value="ESTP">ESTP · 企业家</option>
+                        <option value="ESFP">ESFP · 表演者</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label>🧑‍🎤 主角性格 <span class="hint">TA是谁</span></label>
+                    <select id="characterSelect">
+                        <option value="ENTJ" selected>ENTJ · 指挥官</option>
+                        <option value="INTJ">INTJ · 建筑师</option>
+                        <option value="INTP">INTP · 逻辑学家</option>
+                        <option value="ENTP">ENTP · 辩论家</option>
+                        <option value="INFJ">INFJ · 提倡者</option>
+                        <option value="INFP">INFP · 调停者</option>
+                        <option value="ENFJ">ENFJ · 主人公</option>
+                        <option value="ENFP">ENFP · 竞选者</option>
+                        <option value="ISTJ">ISTJ · 物流师</option>
+                        <option value="ISFJ">ISFJ · 守卫者</option>
+                        <option value="ESTJ">ESTJ · 总经理</option>
+                        <option value="ESFJ">ESFJ · 执政官</option>
+                        <option value="ISTP">ISTP · 鉴赏家</option>
+                        <option value="ISFP">ISFP · 探险家</option>
+                        <option value="ESTP">ESTP · 企业家</option>
+                        <option value="ESFP">ESFP · 表演者</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label>📂 题材方向 <span class="hint">讲什么故事</span></label>
+                    <select id="genreSelect">
+                        <option value="商战" selected>🏛️ 商战 · 权谋</option>
+                        <option value="科幻">🚀 科幻 · 策略</option>
+                        <option value="悬疑">🔍 悬疑 · 推理</option>
+                        <option value="成长">🌱 成长 · 青春</option>
+                        <option value="治愈">🌿 治愈 · 温情</option>
+                        <option value="喜剧">😂 喜剧 · 恋爱</option>
+                        <option value="动作">💥 动作 · 冒险</option>
+                        <option value="职场">💼 职场 · 现实</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 结果面板 -->
+            <div class="result-panel" id="resultPanel">
+                <div class="metric">
+                    <div class="ml">🎯 匹配度</div>
+                    <div class="ring-container">
+                        <div class="ring-wrapper">
+                            <svg viewBox="0 0 72 72">
+                                <circle class="bg" cx="36" cy="36" r="30" />
+                                <circle class="progress" id="ringProgress" cx="36" cy="36" r="30" />
+                            </svg>
+                            <div class="center-text" id="matchScore">0<span class="unit">%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="ml">📈 爆款潜力</div>
+                    <div id="potentialDisplay">
+                        <span class="potential-badge high">🔥 高</span>
+                    </div>
+                    <span class="sub-hint" style="font-size:9px;color:rgba(255,255,255,0.06);">市场竞争力评估</span>
+                </div>
+
+                <div class="metric">
+                    <div class="ml">⭐ 推荐指数</div>
+                    <div class="stars" id="starsDisplay"><span class="filled">★★★★★</span></div>
+                    <span class="sub-hint" style="font-size:9px;color:rgba(255,255,255,0.06);">综合推荐等级</span>
+                </div>
+            </div>
+
+            <!-- 建议框 -->
+            <div class="advice-box" id="adviceBox">
+                💡 <strong>创作建议：</strong><span class="hl">INTJ</span> 观众喜欢智斗和逻辑严密的故事，<span class="gold">商战</span> + <span class="gold">ENTJ 主角</span> 是黄金组合。
+            </div>
+
+            <!-- 详细建议 -->
+            <div class="advice-box" id="detailBox" style="border-left-color:#facc15; font-size:12px; min-height:30px;">
+                📝 <strong>人设建议：</strong>主角沉稳、冷静、算无遗策 · 每集至少 3 次认知反转 · 适合竖屏短剧
+            </div>
+
+            <!-- ===== 操作栏 ===== -->
+            <div class="action-bar">
+                <button class="btn primary" id="copyBtn">
+                    <span class="icon">📋</span> 一键复制策划案
+                </button>
+                <button class="btn" id="resetBtn">
+                    <span class="icon">⟳</span> 重置
+                </button>
+                <span class="share-link" id="shareLink">🔗 链接已自动生成</span>
+            </div>
+
+            <!-- ===== 反馈 ===== -->
+            <div class="feedback-bar">
+                <span>💬 这个推演对你有帮助吗？</span>
+                <button class="fb-btn" data-value="helpful">👍</button>
+                <button class="fb-btn" data-value="ok">🤔</button>
+                <button class="fb-btn" data-value="useless">👎</button>
+                <span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.02);">反馈帮助我们改进</span>
+            </div>
+
+        </div>
+
+        <!-- ===== 底部 ===== -->
+        <div class="footer">
+            <a href="https://github.com/你的用户名/short-drama-mbti">GitHub</a>
+            <span class="note">短剧 MBTI · 创作决策推演器 v1.0</span>
+        </div>
+
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== 鼠标光晕 =====
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
+
+        // ================================================================
+        // ===== Toast =====
+        // ================================================================
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._timer);
+            el._timer = setTimeout(() => el.classList.remove('show'), 2200);
+        }
+
+        // ================================================================
+        // ===== MBTI 数据 =====
+        // ================================================================
+        const MBTI_DATA = {
+            'INTJ': { bestMatch: ['ENTJ', 'INTJ'], genres: ['商战', '科幻', '悬疑'], advice: '主角必须"算无遗策"，每集至少 3 次认知反转。', characterNote: '沉稳、冷静、有长远布局。情感戏 ≤ 20%。', hitPotential: 'high', stars: 5 },
+            'INTP': { bestMatch: ['INTP', 'ENTP'], genres: ['科幻', '悬疑', '推理'], advice: '烧脑优先，每集留一个"细思极恐"的点。', characterNote: '理性、好奇、喜欢解谜。台词要有信息密度。', hitPotential: 'medium-high', stars: 4 },
+            'ENTJ': { bestMatch: ['ENTJ', 'INTJ'], genres: ['商战', '创业', '权谋'], advice: '主角从"被低估"到"掌控全场"的完整弧光。', characterNote: '强势、有领导力、结果导向。', hitPotential: 'high', stars: 5 },
+            'ENTP': { bestMatch: ['ENTJ', 'INTJ', 'ENTP'], genres: ['商战', '悬疑', '科幻'], advice: '每 30 秒一个反转，观众要觉得"我没想到"。', characterNote: '聪明、反应快、喜欢辩论。台词要锋利。', hitPotential: 'high', stars: 5 },
+            'INFJ': { bestMatch: ['INFJ', 'ENFJ'], genres: ['成长', '治愈', '人文'], advice: '主角要有"不得不做"的使命，结局必须升华。', characterNote: '温柔、有信念、有使命感。', hitPotential: 'medium-high', stars: 4 },
+            'INFP': { bestMatch: ['INFP', 'ENFP', 'INFJ'], genres: ['成长', '治愈', '奇幻'], advice: '主角的内心戏要写透，观众要跟着哭跟着笑。', characterNote: '敏感、纯粹、有理想。画面要美。', hitPotential: 'medium-high', stars: 4 },
+            'ENFJ': { bestMatch: ['ENFJ', 'INFJ'], genres: ['成长', '群像', '社会'], advice: '主角要有"感染力"，剧情要有"影响力"。', characterNote: '热情、有魅力、关心他人。群像戏要丰富。', hitPotential: 'medium-high', stars: 4 },
+            'ENFP': { bestMatch: ['ENFP', 'ENFJ', 'INFP'], genres: ['喜剧', '恋爱', '冒险'], advice: '节奏要轻快，主角要"有趣"，结局要"有希望"。', characterNote: '活泼、自由、充满可能性。', hitPotential: 'medium-high', stars: 4 },
+            'ISTJ': { bestMatch: ['ESTJ', 'ISTJ'], genres: ['职场', '现实', '历史'], advice: '道具、台词、流程必须经得起推敲。', characterNote: '可靠、负责、注重细节。真实感要强。', hitPotential: 'medium', stars: 3 },
+            'ISFJ': { bestMatch: ['ESFJ', 'ISFJ'], genres: ['温情', '日常', '家庭'], advice: '烟火气要足，主角要"像你身边的人"。', characterNote: '温暖、体贴、重视传统。人情味要浓。', hitPotential: 'medium', stars: 3 },
+            'ESTJ': { bestMatch: ['ESTJ', 'ISTJ'], genres: ['职场', '创业', '竞技'], advice: '主角要"能扛事"，剧情要"快节奏"。', characterNote: '果断、高效、有执行力。', hitPotential: 'medium-high', stars: 4 },
+            'ESFJ': { bestMatch: ['ESFJ', 'ISFJ'], genres: ['家庭', '群像', '情感'], advice: '多线叙事，多条感情线交织，结局要"圆满"。', characterNote: '热情、善于照顾人、重视关系。', hitPotential: 'medium', stars: 3 },
+            'ISTP': { bestMatch: ['ISTP', 'ESTP'], genres: ['动作', '冒险', '悬疑'], advice: '动作戏要专业，主角"人狠话不多"。', characterNote: '冷静、务实、动手能力强。', hitPotential: 'medium-high', stars: 4 },
+            'ISFP': { bestMatch: ['ISFP', 'ESFP'], genres: ['艺术', '旅行', '治愈'], advice: '画面要美，配乐要准，台词要少而精。', characterNote: '敏感、有艺术气质、追求美。', hitPotential: 'medium', stars: 3 },
+            'ESTP': { bestMatch: ['ESTP', 'ISTP'], genres: ['动作', '喜剧', '冒险'], advice: '节奏快、场面炸、主角"敢作敢当"。', characterNote: '大胆、灵活、喜欢刺激。', hitPotential: 'medium-high', stars: 4 },
+            'ESFP': { bestMatch: ['ESFP', 'ISFP'], genres: ['喜剧', '恋爱', '综艺'], advice: '不许冷场，每 10 秒一个笑点或亮点。', characterNote: '活泼、有趣、高颜值。', hitPotential: 'medium-high', stars: 4 }
+        };
+
+        const TYPE_NAMES = {
+            'INTJ': '建筑师',
+            'INTP': '逻辑学家',
+            'ENTJ': '指挥官',
+            'ENTP': '辩论家',
+            'INFJ': '提倡者',
+            'INFP': '调停者',
+            'ENFJ': '主人公',
+            'ENFP': '竞选者',
+            'ISTJ': '物流师',
+            'ISFJ': '守卫者',
+            'ESTJ': '总经理',
+            'ESFJ': '执政官',
+            'ISTP': '鉴赏家',
+            'ISFP': '探险家',
+            'ESTP': '企业家',
+            'ESFP': '表演者'
+        };
+
+        const POTENTIAL_MAP = {
+            'high': { label: '🔥 高', cls: 'high' },
+            'medium-high': { label: '⚡ 中高', cls: 'medium-high' },
+            'medium': { label: '📊 中等', cls: 'medium' },
+            'low': { label: '📉 偏低', cls: 'low' }
+        };
+
+        // ================================================================
+        // ===== 推演引擎 =====
+        // ================================================================
+        function update() {
+            const audience = document.getElementById('audienceSelect').value;
+            const character = document.getElementById('characterSelect').value;
+            const genre = document.getElementById('genreSelect').value;
+
+            const data = MBTI_DATA[audience];
+            if (!data) return;
+
+            // 计算匹配度
+            const isBestMatch = data.bestMatch.includes(character);
+            const isGenreMatch = data.genres.includes(genre);
+
+            let baseScore = 70;
+            if (isBestMatch) baseScore += 20;
+            if (isGenreMatch) baseScore += 10;
+            if (character === audience) baseScore -= 15;
+            const score = Math.min(95, Math.max(40, baseScore));
+
+            // 环形进度条
+            const circumference = 188.5;
+            const offset = circumference - (score / 100) * circumference;
+            const ring = document.getElementById('ringProgress');
+            ring.style.setProperty('--offset', offset + 'px');
+            ring.style.strokeDashoffset = offset;
+
+            // 颜色
+            let color = '#a78bfa';
+            if (score >= 80) color = '#22c55e';
+            else if (score >= 60) color = '#facc15';
+            else if (score >= 45) color = '#60a5fa';
+            else color = '#ef4444';
+            ring.style.stroke = color;
+
+            document.getElementById('matchScore').innerHTML = score + '<span class="unit">%</span>';
+
+            // 爆款潜力
+            const pot = data.hitPotential || 'medium';
+            const potInfo = POTENTIAL_MAP[pot] || POTENTIAL_MAP['medium'];
+            document.getElementById('potentialDisplay').innerHTML =
+                `<span class="potential-badge ${potInfo.cls}">${potInfo.label}</span>`;
+
+            // 星级
+            const stars = data.stars || 3;
+            document.getElementById('starsDisplay').innerHTML =
+                '<span class="filled">' + '★'.repeat(stars) + '</span>' + '☆'.repeat(5 - stars);
+
+            // 主建议
+            const audienceName = TYPE_NAMES[audience] || audience;
+            const characterName = TYPE_NAMES[character] || character;
+            const matchDesc = isBestMatch ? '黄金组合' : (isGenreMatch ? '良好搭配' : '需要调整');
+
+            document.getElementById('adviceBox').innerHTML =
+                `💡 <strong>创作建议：</strong><span class="hl">${audienceName}</span> 观众喜欢 ${data.advice.split('。')[0]}<br>
+                <span style="font-size:12px;color:rgba(255,255,255,0.2);">${characterName} 主角 × ${genre} 题材 → <span class="gold">${matchDesc}</span></span>`;
+
+            // 详细建议
+            const genreAdvice = isGenreMatch ?
+                `题材契合度高，${genre} 方向推荐` :
+                `建议考虑 ${data.genres.slice(0,2).join('、')} 等更适合该观众群体的题材`;
+
+            document.getElementById('detailBox').innerHTML =
+                `📝 <strong>人设建议：</strong>${data.characterNote}<br>
+                <span style="font-size:12px;color:rgba(255,255,255,0.15);">${data.advice}</span><br>
+                <span style="font-size:11px;color:rgba(255,255,255,0.08);">${genreAdvice}</span>`;
+
+            // 更新分享链接
+            const url = new URL(window.location.href);
+            url.searchParams.set('audience', audience);
+            url.searchParams.set('character', character);
+            url.searchParams.set('genre', genre);
+            document.getElementById('shareLink').textContent = '🔗 ' + url.toString();
+
+            // 高亮 MBTI 参考
+            document.querySelectorAll('.mbti-ref .item').forEach(el => {
+                const code = el.querySelector('.code')?.textContent;
+                el.classList.toggle('active', code === audience || code === character);
+            });
+
+            // 保存当前状态供复制用
+            window._currentResult = { audience, character, genre, score, audienceName, characterName, matchDesc, data };
+        }
+
+        // ================================================================
+        // ===== 复制策划案 =====
+        // ================================================================
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const r = window._currentResult;
+            if (!r) { showToast('请先完成一次推演'); return; }
+
+            const text = `🎭 短剧 MBTI 创作策划案
+            ================================
+            目标观众：${r.audience} · ${r.audienceName}
+            主角性格：${r.character} · ${r.characterName}
+            题材方向：${r.genre}
+
+            📊 匹配度：${r.score}%
+            📈 爆款潜力：${POTENTIAL_MAP[r.data.hitPotential]?.label || '中等'}
+            ⭐ 推荐指数：${'★'.repeat(r.data.stars)}${'☆'.repeat(5 - r.data.stars)}
+
+            📝 创作建议：
+            ${r.data.advice}
+
+            👤 人设建议：
+            ${r.data.characterNote}
+
+            📂 题材建议：
+            ${r.data.genres.join('、')} 是该观众群体的优选题材
+
+            ---
+            由 短剧 MBTI 创作推演器 生成
+            https://github.com/你的用户名/short-drama-mbti`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 策划案已复制到剪贴板');
+            }).catch(() => {
+                // 降级方案
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showToast('✅ 策划案已复制到剪贴板');
+            });
+        });
+
+        // ================================================================
+        // ===== 重置 =====
+        // ================================================================
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('audienceSelect').value = 'INTJ';
+            document.getElementById('characterSelect').value = 'ENTJ';
+            document.getElementById('genreSelect').value = '商战';
+            update();
+            showToast('⟳ 已重置');
+        });
+
+        // ================================================================
+        // ===== 反馈按钮 =====
+        // ================================================================
+        document.querySelectorAll('.fb-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const val = this.dataset.value;
+                const labels = { helpful: '👍 感谢反馈！', ok: '🤔 收到，我们会继续优化', useless: '👎 收到，我们会改进' };
+                document.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                showToast(labels[val] || '感谢反馈');
+            });
+        });
+
+        // ================================================================
+        // ===== URL 参数读取 =====
+        // ================================================================
+        (function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const audience = params.get('audience');
+            const character = params.get('character');
+            const genre = params.get('genre');
+            if (audience && document.getElementById('audienceSelect').querySelector(`option[value="${audience}"]`)) {
+                document.getElementById('audienceSelect').value = audience;
+            }
+            if (character && document.getElementById('characterSelect').querySelector(`option[value="${character}"]`)) {
+                document.getElementById('characterSelect').value = character;
+            }
+            if (genre && document.getElementById('genreSelect').querySelector(`option[value="${genre}"]`)) {
+                document.getElementById('genreSelect').value = genre;
+            }
+            update();
+        })();
+
+        // ================================================================
+        // ===== 绑定事件 =====
+        // ================================================================
+        document.getElementById('audienceSelect').addEventListener('change', update);
+        document.getElementById('characterSelect').addEventListener('change', update);
+        document.getElementById('genreSelect').addEventListener('change', update);
+
+        // ================================================================
+        // ===== 快捷键 =====
+        // ================================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                if (!e.ctrlKey && !e.metaKey) {
+                    document.getElementById('resetBtn').click();
+                }
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                // 让用户自己按 Ctrl+C 复制
+            }
+        });
+
+        // 初始运行
+        update();
+    </script>
+
+</body>
+</html>
