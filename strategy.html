@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y.Mine · 发布策略推演器</title>
+    <style>
+        /* ===== 全局 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0b1a;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            cursor: default;
+            color: #f1f5f9;
+        }
+
+        #glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(120, 80, 255, 0.06), transparent 80%);
+            transition: background 0.1s;
+        }
+
+        .container {
+            max-width: 1024px;
+            width: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #120b24, #0b0b1a 70%, #05030a);
+            border-radius: 32px;
+            padding: 36px 40px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(40, 10, 80, 0.5);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
+
+        .container::before,
+        .container::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBg 12s ease-in-out infinite alternate;
+        }
+        .container::before {
+            top: -80px;
+            right: -80px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(80, 30, 140, 0.10), transparent 70%);
+        }
+        .container::after {
+            bottom: -60px;
+            left: -60px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(30, 60, 150, 0.06), transparent 70%);
+            animation-direction: alternate-reverse;
+        }
+
+        @keyframes floatBg {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -20px) scale(1.1); }
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(24px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 品牌头 ===== */
+        .brand-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease forwards;
+        }
+
+        .brand-header .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.3px;
+        }
+        .brand-header .logo span {
+            color: #a78bfa;
+        }
+
+        .brand-header .tagline {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.12);
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            border-left: 1px solid rgba(255, 255, 255, 0.04);
+            padding-left: 12px;
+        }
+
+        .brand-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.04s forwards;
+        }
+        .brand-sub .hl {
+            color: #a78bfa;
+        }
+        .brand-sub .gold {
+            color: #facc15;
+        }
+        .brand-sub .green {
+            color: #22c55e;
+        }
+
+        /* ===== 主面板 ===== */
+        .simulator-section {
+            background: rgba(167, 139, 250, 0.03);
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            border-radius: 16px;
+            padding: 22px 24px 18px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.08s forwards;
+        }
+
+        .sim-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sim-title .tag {
+            font-size: 10px;
+            font-weight: 500;
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.08);
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .sim-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        /* ===== 滑块网格 ===== */
+        .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px 24px;
+            margin-bottom: 16px;
+        }
+
+        .ctrl {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ctrl label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ctrl label .val {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+        .ctrl label .val.purple {
+            color: #a78bfa;
+        }
+        .ctrl label .val.gold {
+            color: #facc15;
+        }
+        .ctrl label .val.blue {
+            color: #60a5fa;
+        }
+
+        .ctrl .sub-hint {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.06);
+        }
+
+        .ctrl input[type="range"] {
+            width: 100%;
+            accent-color: #a78bfa;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .ctrl input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            box-shadow: 0 0 24px rgba(167, 139, 250, 0.2);
+        }
+
+        /* ===== 结果面板 ===== */
+        .result-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 14px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric .ml {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .metric .mv {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 2px;
+        }
+        .metric .mv .unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.15);
+        }
+        .metric .mv.highlight {
+            color: #a78bfa;
+        }
+        .metric .mv.gold {
+            color: #facc15;
+        }
+
+        /* ===== 执行清单 ===== */
+        .executive-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 12px;
+        }
+
+        .executive-box .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .executive-box .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .executive-box .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 4px 0;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .executive-box .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .executive-box .action-item .num {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.08);
+            min-width: 20px;
+            flex-shrink: 0;
+        }
+
+        .executive-box .action-item .content {
+            flex: 1;
+        }
+
+        .executive-box .action-item .content .highlight {
+            color: #a78bfa;
+        }
+        .executive-box .action-item .content .gold {
+            color: #facc15;
+        }
+        .executive-box .action-item .content .green {
+            color: #22c55e;
+        }
+
+        /* ===== 风险提示 ===== */
+        .risk-box {
+            background: rgba(239, 68, 68, 0.03);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border-left: 3px solid rgba(239, 68, 68, 0.2);
+            margin-bottom: 12px;
+        }
+
+        .risk-box .risk-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(239, 68, 68, 0.2);
+            margin-bottom: 2px;
+        }
+
+        .risk-box .risk-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.7;
+        }
+
+        .risk-box .risk-text .hl {
+            color: #ef4444;
+        }
+
+        /* ===== 底部导航 ===== */
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 4px;
+        }
+
+        .footer-nav a {
+            color: rgba(255, 255, 255, 0.08);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-nav a:hover {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .footer-nav .note {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.04);
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== 底部版权 ===== */
+        .footer {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease 0.15s forwards;
+        }
+
+        .footer .copy {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: rgba(167, 139, 250, 0.12);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 13px;
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transition: all 0.5s ease;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0px);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 700px) {
+            body {
+                padding: 12px;
+            }
+            .container {
+                padding: 20px 16px 16px;
+                border-radius: 20px;
+            }
+            .brand-header .tagline {
+                border-left: none;
+                padding-left: 0;
+                width: 100%;
+            }
+            .sim-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .result-panel {
+                grid-template-columns: 1fr 1fr;
+            }
+            .footer-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px 14px;
+            }
+            .result-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="glow"></div>
+
+    <div class="container">
+
+        <!-- ===== 品牌头 ===== -->
+        <div class="brand-header">
+            <div class="logo">Y.<span>Mine</span></div>
+            <div class="tagline">发布策略推演器</div>
+        </div>
+        <div class="brand-sub">
+            <span class="hl">前额叶（数据逻辑）</span> × <span class="gold">边缘系统（市场直觉）</span> = <span class="green">可执行的发布策略</span>
+        </div>
+
+        <!-- ===== 主面板 ===== -->
+        <div class="simulator-section">
+
+            <div class="sim-title">
+                📊 发布策略推演
+                <span class="tag">行动清单</span>
+            </div>
+            <div class="sim-sub">
+                调节 <span class="hl">数据深度</span>、<span class="gold">直觉敏锐度</span>、<span class="gold">外部不确定性</span>，生成 <span style="color:#22c55e;">可执行的发布计划</span>
+            </div>
+
+            <!-- ===== 滑块 ===== -->
+            <div class="sim-grid">
+                <div class="ctrl">
+                    <label>
+                        📊 数据分析深度
+                        <span class="val purple" id="digitalVal">0.70</span>
+                    </label>
+                    <input type="range" id="digitalInput" min="0.1" max="1.0" step="0.01" value="0.70" />
+                    <span class="sub-hint">用户洞察 · 竞对分析 · 历史数据</span>
+                </div>
+                <div class="ctrl">
+                    <label>
+                        🧠 市场直觉敏锐度
+                        <span class="val gold" id="businessVal">0.70</span>
+                    </label>
+                    <input type="range" id="businessInput" min="0.1" max="1.0" step="0.01" value="0.70" />
+                    <span class="sub-hint">时机判断 · 情绪感知 · 品牌势能</span>
+                </div>
+                <div class="ctrl">
+                    <label>
+                        🌪️ 外部不确定性
+                        <span class="val blue" id="complexityVal">0.50</span>
+                    </label>
+                    <input type="range" id="complexityInput" min="0.1" max="1.0" step="0.01" value="0.50" />
+                    <span class="sub-hint">竞对动作 · 舆论风向 · 市场波动</span>
+                </div>
+            </div>
+
+            <!-- ===== 结果面板 ===== -->
+            <div class="result-panel">
+                <div class="metric">
+                    <div class="ml">📈 执行胜率</div>
+                    <div class="mv highlight" id="successRate">0.0<span class="unit">%</span></div>
+                </div>
+                <div class="metric">
+                    <div class="ml">🎯 策略评级</div>
+                    <div class="mv gold" id="riskLevel">⚖️ 均衡</div>
+                </div>
+                <div class="metric">
+                    <div class="ml">📌 建议预算</div>
+                    <div class="mv" id="budgetDisplay" style="color:#22c55e;">0<span class="unit">%</span></div>
+                </div>
+            </div>
+
+            <!-- ===== 执行清单 ===== -->
+            <div class="executive-box">
+                <div class="section-label">📋 执行清单</div>
+                <div id="actionList">
+                    <div class="action-item"><span class="num">1</span><span class="content">调整参数生成行动建议</span></div>
+                </div>
+            </div>
+
+            <!-- ===== 风险提示 ===== -->
+            <div class="risk-box" id="riskBox">
+                <div class="risk-label">⚠️ 风险提示</div>
+                <div class="risk-text" id="riskText">调整参数后查看具体风险提示</div>
+            </div>
+
+            <!-- ===== 底部导航 ===== -->
+            <div class="footer-nav">
+                <a href="index.html">🎭 返回短剧推演器</a>
+                <span class="note">Y.Mine · 发布策略推演器</span>
+            </div>
+
+        </div>
+
+        <!-- ===== 底部版权 ===== -->
+        <div class="footer">
+            <span class="copy">© 2026 Y.Mine · 发布策略推演器</span>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== 鼠标光晕 =====
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth * 100;
+            const y = e.clientY / window.innerHeight * 100;
+            glow.style.setProperty('--x', x + '%');
+            glow.style.setProperty('--y', y + '%');
+        });
+
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._timer);
+            el._timer = setTimeout(() => el.classList.remove('show'), 2200);
+        }
+
+        // ================================================================
+        // ===== 策略推演引擎 =====
+        // ================================================================
+        (function() {
+            const digitalInput = document.getElementById('digitalInput');
+            const businessInput = document.getElementById('businessInput');
+            const complexityInput = document.getElementById('complexityInput');
+            const digitalVal = document.getElementById('digitalVal');
+            const businessVal = document.getElementById('businessVal');
+            const complexityVal = document.getElementById('complexityVal');
+            const successRate = document.getElementById('successRate');
+            const riskLevel = document.getElementById('riskLevel');
+            const budgetDisplay = document.getElementById('budgetDisplay');
+            const actionList = document.getElementById('actionList');
+            const riskText = document.getElementById('riskText');
+
+            function update() {
+                const d = parseFloat(digitalInput.value);
+                const b = parseFloat(businessInput.value);
+                const c = parseFloat(complexityInput.value);
+
+                digitalVal.textContent = d.toFixed(2);
+                businessVal.textContent = b.toFixed(2);
+                complexityVal.textContent = c.toFixed(2);
+
+                // 核心计算
+                const rawRate = (d * b) / (1 + c * 0.6);
+                const rate = Math.min(0.95, Math.max(0.05, rawRate));
+
+                // 预算建议：胜率越高，建议投入越多
+                const budget = Math.round(rate * 100);
+
+                // 策略评级
+                let levelText, levelColor;
+                if (rate > 0.72) { levelText = '🟢 高胜率出击';
+                    levelColor = '#22c55e'; } else if (rate > 0.45) { levelText = '🟡 谨慎推进';
+                    levelColor = '#facc15'; } else { levelText = '🔴 收缩防守';
+                    levelColor = '#ef4444'; }
+
+                successRate.innerHTML = (rate * 100).toFixed(1) + '<span class="unit">%</span>';
+                riskLevel.textContent = levelText;
+                riskLevel.style.color = levelColor;
+                budgetDisplay.innerHTML = budget + '<span class="unit">%</span>';
+
+                // ===== 生成执行清单 =====
+                let actions = [];
+                let riskMsg = '';
+
+                // 根据数据深度推荐内容策略
+                if (d >= 0.7) {
+                    actions.push({
+                        num: 1,
+                        text: '📊 利用数据分析，优先选择 <span class="highlight">完播率最高的前3个选题方向</span> 进行测试'
+                    });
+                } else {
+                    actions.push({
+                        num: 1,
+                        text: '📊 数据不足，建议先做 <span class="gold">小规模A/B测试</span>（预算控制在总预算的15%以内）'
+                    });
+                }
+
+                // 根据直觉敏锐度推荐发布时间
+                if (b >= 0.6) {
+                    actions.push({
+                        num: 2,
+                        text: '🧠 直觉判断力强，建议在 <span class="gold">周五晚8点或周六早10点</span> 首发（用户活跃高峰）'
+                    });
+                } else {
+                    actions.push({
+                        num: 2,
+                        text: '🧠 直觉判断力较弱，建议参考平台数据选择 <span class="highlight">历史表现最好的时段</span> 发布'
+                    });
+                }
+
+                // 根据不确定性推荐预算分配
+                if (c <= 0.4) {
+                    actions.push({
+                        num: 3,
+                        text: '🌪️ 市场稳定，建议 <span class="green">首轮投入预算的40%</span>，表现好再追加'
+                    });
+                } else if (c <= 0.7) {
+                    actions.push({
+                        num: 3,
+                        text: '🌪️ 市场中度不确定，建议 <span class="gold">分3批投放</span>（30% / 30% / 40%），每批间隔12小时'
+                    });
+                } else {
+                    actions.push({
+                        num: 3,
+                        text: '🌪️ 市场高度不确定，建议 <span class="highlight">保守投放</span>（首轮不超过20%，观望竞对反应后决策）'
+                    });
+                }
+
+                // 补充：内容形式建议
+                if (d >= 0.6 && b >= 0.6) {
+                    actions.push({
+                        num: 4,
+                        text: '🎬 数据与直觉双高，建议采用 <span class="green">竖屏短剧 + 前3秒强钩子</span> 形式'
+                    });
+                } else if (d >= 0.6) {
+                    actions.push({
+                        num: 4,
+                        text: '🎬 数据驱动为主，建议采用 <span class="highlight">信息流原生内容</span>（与平台调性保持一致）'
+                    });
+                } else {
+                    actions.push({
+                        num: 4,
+                        text: '🎬 直觉驱动为主，建议采用 <span class="gold">情感向内容</span>（故事性强、共鸣感高）'
+                    });
+                }
+
+                // 渲染清单
+                actionList.innerHTML = actions.map(a =>
+                    `<div class="action-item"><span class="num">${a.num}</span><span class="content">${a.text}</span></div>`
+                ).join('');
+
+                // ===== 风险提示 =====
+                if (rate < 0.35) {
+                    riskMsg = '⚠️ 当前胜率较低，建议 <span class="hl">暂停发布</span>，先优化内容方向或等待更好的时机。';
+                } else if (c > 0.7 && rate < 0.5) {
+                    riskMsg = '⚠️ 市场高度不确定，建议 <span class="hl">预留30%预算</span> 作为应急储备，随时准备调整策略。';
+                } else if (rate > 0.75) {
+                    riskMsg = '✅ 胜率较高，风险可控。建议 <span class="gold">快速决策</span>，抓住窗口期。';
+                } else if (d < 0.4 && b < 0.4) {
+                    riskMsg = '⚠️ 数据与直觉均偏弱，建议 <span class="hl">先做小范围测试</span>，不要一次性投入全部资源。';
+                } else {
+                    riskMsg = '📊 当前策略处于可控范围，建议按清单执行，<span class="gold">每12小时复盘一次</span>。';
+                }
+                riskText.innerHTML = riskMsg;
+            }
+
+            digitalInput.addEventListener('input', update);
+            businessInput.addEventListener('input', update);
+            complexityInput.addEventListener('input', update);
+
+            // 预置初始值
+            for (let i = 0; i < 20; i++) {
+                const d = 0.4 + 0.4 * (i / 20);
+                const b = 0.4 + 0.4 * (i / 20);
+                const c = 0.3 + 0.4 * Math.sin(i / 4);
+            }
+            update();
+
+            // 暴露给外部
+            window.updateStrategy = update;
+        })();
+    </script>
+
+</body>
+</html>
