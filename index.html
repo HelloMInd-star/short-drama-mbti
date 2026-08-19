@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>短剧 MBTI · 创作推演器</title>
+    <title>Y.Mine · 短剧 MBTI 创作推演器</title>
     <style>
         /* ===== 全局 ===== */
         * {
@@ -636,14 +636,24 @@
             animation: fadeInUp 0.7s ease 0.15s forwards;
         }
 
+        .footer .footer-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
         .footer a {
-            color: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.08);
             text-decoration: none;
             font-size: 13px;
             transition: color 0.3s ease;
         }
         .footer a:hover {
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .footer .divider {
+            color: rgba(255, 255, 255, 0.03);
         }
 
         .footer .note {
@@ -718,6 +728,15 @@
             .platform-row .preset-hint {
                 text-align: center;
             }
+            .footer {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 6px;
+            }
+            .footer .footer-links {
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -748,8 +767,8 @@
 
         <!-- ===== 品牌头 ===== -->
         <div class="brand-header">
-            <div class="logo">短剧<span>MBTI</span></div>
-            <div class="tagline">创作推演器 · 平台适配版</div>
+            <div class="logo">Y.<span>Mine</span></div>
+            <div class="tagline">短剧 MBTI 创作推演器</div>
         </div>
         <div class="brand-sub">
             <span class="hl">选平台</span> → 自动预设 → <span class="gold">生成平台专属脚本</span>
@@ -946,8 +965,12 @@
 
         <!-- ===== 底部 ===== -->
         <div class="footer">
-            <a href="https://github.com/你的用户名/short-drama-mbti">GitHub</a>
-            <span class="note">短剧 MBTI · 平台适配版 v1.2</span>
+            <div class="footer-links">
+                <a href="https://github.com/你的用户名/short-drama-mbti">GitHub</a>
+                <span class="divider">·</span>
+                <a href="strategy.html" style="color:#a78bfa;">📊 查看发布策略 →</a>
+            </div>
+            <span class="note">Y.Mine · 短剧 MBTI 创作推演器 v1.2</span>
         </div>
 
     </div>
@@ -1067,7 +1090,6 @@
             document.getElementById('genreSelect').value = preset.genre;
             document.getElementById('platformHint').textContent = '预设：' + preset.hint;
 
-            // 触发更新
             update();
         }
 
@@ -1132,14 +1154,12 @@
                 <span style="font-size:12px;color:rgba(255,255,255,0.15);">${data.advice}</span><br>
                 <span style="font-size:11px;color:rgba(255,255,255,0.08);">${genreAdvice}</span>`;
 
-            // 更新分享链接
             const url = new URL(window.location.href);
             url.searchParams.set('audience', audience);
             url.searchParams.set('character', character);
             url.searchParams.set('genre', genre);
             document.getElementById('shareLink').textContent = '🔗 ' + url.toString();
 
-            // 高亮 MBTI 参考
             document.querySelectorAll('.mbti-ref .item').forEach(el => {
                 const code = el.querySelector('.code')?.textContent;
                 el.classList.toggle('active', code === audience || code === character);
@@ -1192,7 +1212,6 @@
                 `🔍 提取关键词：<span style="color:#a78bfa;">${keywords.join('、')}</span><br>` +
                 `🧠 基于关键词匹配的 MBTI 方向：<span style="color:#facc15;">目标观众 → ENFP / ISFP，主角 → ENFP</span>`;
 
-            // 根据关键词推荐
             let recommendedAudience = 'ENFP';
             let recommendedCharacter = 'ENFP';
             let recommendedGenre = '喜剧';
@@ -1232,7 +1251,6 @@
                 .selectedIndex].text.split(' ')[0] || '短剧';
             const characterNameFull = TYPE_NAMES[result.character] || result.character;
 
-            // 使用模板生成脚本
             let script = data.scriptTemplate ?
                 data.scriptTemplate(title, genreLabel, characterNameFull) :
                 `【优化版 · ${genreLabel}短剧】\n` +
@@ -1278,7 +1296,7 @@
 
         ${scriptText ? '\n📜 优化版脚本：\n' + scriptText : ''}
         ---
-        由 短剧 MBTI 创作推演器 生成
+        由 Y.Mine · 短剧 MBTI 创作推演器 生成
         https://github.com/你的用户名/short-drama-mbti`;
 
             navigator.clipboard.writeText(text).then(() => {
@@ -1367,7 +1385,6 @@
         // ================================================================
         // ===== 初始化 =====
         // ================================================================
-        // 默认加载红果短剧预设
         applyPlatformPreset('hongguo');
     </script>
 
